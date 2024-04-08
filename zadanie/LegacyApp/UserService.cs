@@ -2,25 +2,18 @@
 
 namespace LegacyApp
 {
-    public interface IClientRepository
-    {
-        Client GetById(int clientId);
-    }
-
-    public interface IUserCreditService
-    {
-        int GetCreditLimit(string lastName, DateTime dateOfBirth);
-    }
     public class UserService
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUserCreditService _userCreditService;
+        private const int MaxCreditLimit = 500;
 
         public UserService()
         {
             _clientRepository = new ClientRepository();
             _userCreditService = new UserCreditService();
         }
+        
         public UserService(IClientRepository clientRepository, IUserCreditService userCreditService)
         {
             _clientRepository = clientRepository;
@@ -66,7 +59,7 @@ namespace LegacyApp
             else if (client.Type == "ImportantClient")
             {
                 int creditLimit = _userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                creditLimit = creditLimit * 2;
+                creditLimit *= 2;
                 user.CreditLimit = creditLimit;
             }
             else
@@ -80,7 +73,7 @@ namespace LegacyApp
         
         private bool CheckCredit(User user)
         {
-            return user.HasCreditLimit && user.CreditLimit < 500;
+            return user.HasCreditLimit && user.CreditLimit < MaxCreditLimit;
         }
     }
 }
